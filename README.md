@@ -20,14 +20,13 @@ This project is a function-calling host powered by Google's Gemini API. It allow
 1. **Clone the Repository**
 
 ```bash
-git clone https://github.com/your/repo.git
-cd your-repo
+https://github.com/nhan6104/Chat_with_database.git
 ```
 
 2. **Install Dependencies**
 
 ```bash
-pip install google-generativeai langgraph langchain-core websocket-client rel
+pip install -r requirement.txt
 ```
 
 3. **Configure Your API Key**
@@ -43,7 +42,8 @@ API_KEY_GEMINI = "your_actual_api_key"
 Start your tool server at the WebSocket address (e.g., `ws://localhost:8000/ws`), then run the chatbot:
 
 ```bash
-python main.py
+cd Host
+streamlit run ui.py
 ```
 
 Enter your message, and if the AI determines a tool function is needed, it will call it automatically.
@@ -65,3 +65,55 @@ Arguments: None
 ## License
 
 MIT License
+
+
+## Running the WebSocket Tool Server
+
+Your Gemini host connects to external tools via WebSocket. You can use the provided tool server by running:
+
+```bash
+cd ecommerceDatabase_Server
+python mcp_server.py
+```
+
+Make sure the `product.csv` file is present in the same directory, as it's required for data loading and tool definitions.
+
+This server exposes several analytical tools, including:
+
+- `get_median_value`
+- `get_unique_values`
+- `get_empty_values`
+- `get_max_values`
+- `describeColumn`
+- `get_correlation`
+- ...
+
+These are auto-discovered and registered by the host.
+
+## Example Connection Flow
+
+1. Run the tool server:
+
+```bash
+python mcp_server.py
+```
+
+2. In a new terminal, start the host:
+
+```bash
+python main.py
+```
+
+3. Type a message like:
+
+```
+Give me the median price of woman clothing.
+```
+
+The system will:
+
+- Send message to Gemini model
+- Model calls a relevant function (e.g., `ecommerce_get_median_value`)
+- Host routes that call to the tool server via WebSocket
+- Tool responds with calculated result
+- Result is printed and returned as chat response
